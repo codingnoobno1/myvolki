@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyVolki Professional Customer Dashboard</title>
+    <style>
+        /* --- General Layout and Theme --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5; /* Very light gray background */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex; /* Use flex for main structure: Sidebar + Main Content */
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #003067; /* Dark Blue Primary */
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            height: 100vh; /* Full height sidebar */
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        .sidebar button {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .sidebar button:hover, .sidebar button.active {
+            background-color: #004a99; /* Lighter blue on hover/active */
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Two main columns */
+            gap: 20px;
+        }
+        .dashboard-grid-full {
+            grid-column: 1 / -1; /* Full width for header/footer sections */
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid #007bff; /* Accent border */
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #003067;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+        .metric-container {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .metric-item {
+            flex: 1;
+            padding: 10px;
+            border-right: 1px solid #eee;
+        }
+        .metric-item:last-child {
+            border-right: none;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+        /* --- Specific Card Styles --- */
+        .license-header {
+            background-color: #003067;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-top: none;
+        }
+        /* --- AI Analysis (Enhanced) --- */
+        .ai-card { /* New class for the parent card of AI insights */
+            border-top: 3px solid #66ffff !important; /* Brighter, glowing accent */
+            background-color: #0f1c2d; /* Darker background for AI */
+            color: #e0f7fa; /* Light, slightly bluish text */
+            box-shadow: 0 0 20px rgba(102, 255, 255, 0.4); /* Glowing effect */
+        }
+        .ai-card h3 {
+            color: #66ffff; /* Brighter title */
+            border-bottom: 1px solid rgba(102, 255, 255, 0.2);
+            font-family: 'Consolas', 'Courier New', monospace; /* Monospaced font for title */
+        }
+        .ai-insights-list {
+            list-style-type: none;
+            padding-left: 0;
+            font-family: 'Consolas', 'Courier New', monospace; /* Monospaced font for insights */
+            font-size: 15px;
+        }
+        .ai-insights-list li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px; /* Space for icon */
+        }
+        .ai-insights-list li::before { /* Placeholder for icons */
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            filter: brightness(1.5); /* Make icons brighter */
+        }
+        .ai-insights-list .alert::before { content: '🚨'; } /* Tyre Pressure */
+        .ai-insights-list .prediction::before { content: '🔮'; } /* DSG Prediction */
+        .ai-insights-list .forecast::before { content: '📅'; } /* Service Forecast */
+        .ai-insights-list .tip::before { content: '💡'; } /* Savings Tip */
+
+        .ai-highlight {
+            color: #99ffff; /* Brighter highlight for key info */
+            font-weight: bold;
+        }
+        .ai-action {
+            color: #ff99cc; /* Action items in a distinct color */
+            font-style: italic;
+        }
+        
+        /* Blinking cursor effect (simplified, pure CSS) */
+        .ai-card h3::after {
+            content: '_';
+            animation: blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { visibility: hidden; }
+            50% { visibility: visible; }
+        }
+
+        /* --- Other Card Styles (unchanged from previous) --- */
+        .chart-placeholder {
+            min-height: 200px;
+            background-color: #f8f8f8;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+        }
+        .service-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .service-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        .service-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>MyVolki</h2>
+        <button class="active">🏠 Dashboard</button>
+        <button>🔧 Service Booking</button>
+        <button>🛍️ Accessories Store</button>
+        <button>🧭 Map & Chargers</button>
+        <button>📄 My Documents</button>
+        <button>⚙️ Settings</button>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="license-header dashboard-grid-full">
+            <h1 style="margin: 0; font-size: 40px; letter-spacing: 2px;">MH 12 AB 4567</h1>
+            <p style="font-size: 16px; margin: 5px 0 10px; opacity: 0.9;">Vehicle: VKMK-2024 | Owner: **John Doe**</p>
+            <span style="font-size: 14px; background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 4px;">License: Valid until 10/2028</span>
+        </div>
+        
+        <div class="dashboard-grid" style="margin-top: 20px;">
+            
+            <div style="grid-column: 1 / 2;">
+
+                <div class="card">
+                    <h3>Real-Time Vehicle Health Overview</h3>
+                    <div class="metric-container">
+                        
+                        <div class="metric-item">
+                            <div class="metric-value" style="color: #28a745;">98.2%</div>
+                            <div class="metric-label">DSG Gearbox Health</div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-value" style="color: #ffc107;">65%</div>
+                            <div class="metric-label">Fuel Level (420 km Range)</div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-value" style="color: #007bff;">12.6V</div>
+                            <div class="metric-label">Electrical System Voltage</div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-value" style="color: #dc3545;">Low</div>
+                            <div class="metric-label">Tyre Pressure Alert (FR)</div>
+                        </div>
+                        
+                        <div class="metric-item" style="border-right: none;">
+                            <div class="metric-value" style="color: #6f42c1;">92°C</div>
+                            <div class="metric-label">Engine Temperature</div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="card ai-card">
+                    <h3>AI Predictive Maintenance Insights 💡</h3>
+                    <ul class="ai-insights-list">
+                        <li class="alert">
+                            <span class="ai-highlight">Critical Alert:</span> **Front Right Tyre Pressure** is $5\%$ below the recommended $32$ PSI. This can lead to increased fuel consumption. <span class="ai-action">*Immediate Action Required.*</span>
+                        </li>
+                        <li class="prediction">
+                            <span class="ai-highlight">DSG Prediction:</span> The **DSG Clutch wear trend** indicates a potential service recommendation will be generated in approximately <span class="ai-highlight">**6 months**</span> ($8,500$ km). <span class="ai-action">*Monitor closely.*</span>
+                        </li>
+                        <li class="forecast">
+                            <span class="ai-highlight">Service Forecast:</span> Based on your $3$ months of driving data, the next major service will be due in <span class="ai-highlight">**$35$ days**</span> or $2,200$ km (whichever comes first).
+                        </li>
+                        <li class="tip">
+                            <span class="ai-highlight">Savings Tip:</span> The AI detected <span class="ai-highlight">**$3$ instances of hard braking**</span> in the last week. Maintaining a smoother driving style could increase brake life by $15\%$.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Vehicle Performance History (DSG Health Trend)</h3>
+                    <div class="chart-placeholder">
+                        *Placeholder for Interactive Line Chart (e.g., DSG Degradation over Time)*
+                    </div>
+                </div>
+
+            </div>
+            
+            <div style="grid-column: 2 / 3;">
+                
+                <div class="card" style="text-align: center;">
+                    <h3>Quick Actions</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button style="padding: 12px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-weight: bold;">Book Service Now</button>
+                        <button style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f9fa; cursor: pointer;">Damage Analyzer</button>
+                        <button style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f9fa; cursor: pointer;">Order Parts</button>
+                        <button style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f9fa; cursor: pointer;">View Manuals</button>
+                    </div>
+                </div>
+
+                <div class="card service-list">
+                    <h3>Recent Service History</h3>
+                    <ul>
+                        <li>
+                            <span>**Major Service**</span>
+                            <span style="color: #666;">22-Sep-2025</span>
+                        </li>
+                        <li>
+                            <span>Tyre Rotation</span>
+                            <span style="color: #666;">15-Jun-2025</span>
+                        </li>
+                        <li>
+                            <span>Oil Change</span>
+                            <span style="color: #666;">10-Feb-2025</span>
+                        </li>
+                    </ul>
+                    <a href="#" style="display: block; text-align: right; margin-top: 10px; font-size: 14px; color: #007bff;">View All History →</a>
+                </div>
+
+                <div class="card">
+                    <h3>Nearby Service Centers</h3>
+                    <div class="chart-placeholder">
+                        *Placeholder for Interactive Map/Locator*
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+
+</body>
+</html>
